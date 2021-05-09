@@ -1,0 +1,62 @@
+name: TemplateSpecs
+trigger:
+- main
+- Dev
+
+variables:
+  resourceGroupName: '4besTemplates'
+  location: 'westeurope'
+  azureSubscription: 'specs'
+  bicepPath: '$(Build.SourcesDirectory)/Specs'
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    steps:
+    - task: AzureCLI@2  
+      displayName: 'build bicep artifact' 
+      inputs: 
+        azureSubscription: $(azureSubscription) 
+        scriptType: 'pscore'  
+        scriptLocation: 'inlineScript'  
+        inlineScript: |
+          $Biceps = Get-ChildItem $(Path) -Recurse -Include *.bicep
+          $Biceps
+          $Biceps | Foreach-Object {
+              az bicep build --file $_.FullName --outfile "$(Build.ArtifactStagingDirectory)/$($_.BaseName).json" 
+          }  
+
+    - task: PublishBuildArtifacts@1 
+      displayName: 'Publish artifact in pipeline' 
+      inputs: 
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'  
+        ArtifactName: 'finishedTemplates'  
+        publishLocation: 'Container' 
+
+- stage: deploy
+  jobs:
+  - deployment: biceptoAzure
+    displayName: 'Deploy bicep to Azure template spec'
+    environment: 'AzureDeployment'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+          - task: DownloadBuildArtifacts@0
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'finishedTemplates'
+              downloadPath: '$(Build.SourcesDirectory)'
+          - task: AzurePowerShell@5
+            inputs:
+              azureSubscription: $(azureSubscription)
+              ScriptType: 'FilePath'
+              ScriptPath: '$(Build.SourcesDirectory)/deploydef.ps1'
+              ScriptArguments: '-Path $(Build.SourcesDirectory) -ResourceGroupName $(ResourceGroupName) -Location $(Location)'
+              azurePowerShellVersion: 'LatestVersion'
