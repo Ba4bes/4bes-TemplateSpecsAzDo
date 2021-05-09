@@ -57,6 +57,6 @@ stages:
             inputs:
               azureSubscription: $(azureSubscription)
               ScriptType: 'FilePath'
-              ScriptPath: '$(Build.SourcesDirectory)/deploydef.ps1'
+              ScriptPath: '$(Build.SourcesDirectory)/deploy-Specs.ps1'
               ScriptArguments: '-Path $(Build.SourcesDirectory) -ResourceGroupName $(ResourceGroupName) -Location $(Location)'
               azurePowerShellVersion: 'LatestVersion'
