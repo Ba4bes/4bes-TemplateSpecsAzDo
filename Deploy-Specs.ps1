@@ -1,3 +1,30 @@
+<#
+.SYNOPSIS
+    This script collects JSON files and deploys them as needed to Azure Template Specs
+.DESCRIPTION
+    The script collects all the JSON files in the Path that is given.
+    It looks for the templates that contain TemplateSpecName and TemplateSpecVersion in the Variables.
+    It checks in Azure if a Template Spec with that name already exists.
+    If it does, it will check if the version in the repository is newer.
+    It will then deploy the template spec only if the version in the repository is newer than the one in Azure.
+.EXAMPLE
+    .\Deploy-Specs.ps1 -Path .\ -ResourceGroupName 'exampleResourceGroup' -Location 'WestEurope'
+
+    ===
+    Will check all JSON files in the Root path and deploy if needed to exampleResourceGroup in the region WestEurope
+.PARAMETER Path
+    The path that is scanned for JSON files. subfolders are included
+.PARAMETER ResourceGroupName
+    The resource group where the Template Specs should be stored. Will be created if it doesn't exist
+.PARAMETER Location
+    The Azure region where the Template Specs should be stored
+.LINK
+    https://4bes.nl/2021/05/09/from-bicep-to-arm-template-specs-with-azure-devops/
+.NOTES
+    Created by Barbara Forbes
+    https://4bes.nl
+    @ba4bes
+#>
 [cmdletbinding()]
 param(
     [parameter(Mandatory = $true)]
