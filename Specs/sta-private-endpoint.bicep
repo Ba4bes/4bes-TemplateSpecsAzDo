@@ -1,6 +1,6 @@
 // This variable is for the Template spec
 var templateSpecName = 'storageAccount-Private-Endpoint'
-var version = '1.0'
+var version = '1.1'
 
 @description('first part of resource name. Max 11 characters')
 param resourcePrefix string
