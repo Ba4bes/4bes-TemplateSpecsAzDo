@@ -1,12 +1,11 @@
 name: TemplateSpecs
 trigger:
 - main
-- Dev
 
 variables:
   resourceGroupName: '4besTemplates'
   location: 'westeurope'
-  azureSubscription: 'specs'
+  azureSubscription: '[ConnectionName]'
   bicepPath: '$(Build.SourcesDirectory)/Specs'
 
 pool:
