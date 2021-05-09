@@ -54,6 +54,7 @@ stages:
               artifactName: 'finishedTemplates'
               downloadPath: '$(Build.SourcesDirectory)'
           - task: AzurePowerShell@5
+            displayName: 'Deploy Template Specs to Azure'
             inputs:
               azureSubscription: $(azureSubscription)
               ScriptType: 'FilePath'

@@ -8,9 +8,10 @@ param(
 #Create resource group if it does not exist
 Try {
     Get-AzResourceGroup $ResourceGroupName -ErrorAction Stop
+    Write-Host "##[debug] ResourceGroup $ResourceGroupName exists and will be used"
 }
-Catch{
-    Write-Host "Creating ResourceGroup $ResourceGroupName"
+Catch {
+    Write-Host "##[command]Creating ResourceGroup $ResourceGroupName"
     New-AzResourceGroup $ResourceGroupName -Location $Location
 }
 
@@ -41,11 +42,11 @@ $Templates.ToArray() | ForEach-Object {
     }
     Catch {
         # If it doesn't exist, set current version to 0 so the version in the repo is always higher
-        Write-Host "TemplateSpec $TemplateSpecName does not exist"
+        Write-Host "## [debug]DebugTemplateSpec $TemplateSpecName does not exist"
         $CurrentVersion = 0
     }
     if ($_.Version -gt $CurrentVersion) {
-        Write-Host "Template $TemplateSpecName in repo is newer than in Azure. Deploying"
+        Write-Host "##[command] Template $TemplateSpecName in repo is newer than in Azure. Deploying"
         $SpecParameters = @{
             Name              = $TemplateSpecName
             ResourceGroupName = $ResourceGroupName
@@ -53,9 +54,14 @@ $Templates.ToArray() | ForEach-Object {
             TemplateFile      = $_.TemplateFileName
             Version           = $_.Version
         }
-        New-AzTemplateSpec @SpecParameters
+        Try {
+            $null = New-AzTemplateSpec @SpecParameters
+        }
+        Catch {
+            Write-Error "##[error]Something went wrong with deploying $TemplateSpecName : $_"
+        }
     }
     else {
-        Write-Host "$TemplateSpecName doesn't have a new version"
+        Write-Host "##[debug] $TemplateSpecName doesn't have a new version"
     }
 }
