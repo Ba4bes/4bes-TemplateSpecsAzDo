@@ -1,7 +1,10 @@
 [cmdletbinding()]
 param(
+    [parameter(Mandatory = $true)]
     [string]$Path  ,
+    [parameter(Mandatory = $true)]
     [string]$ResourceGroupName  ,
+    [parameter(Mandatory = $true)]
     [string]$Location
 )
 
