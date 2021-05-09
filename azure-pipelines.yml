@@ -24,7 +24,7 @@ stages:
         scriptType: 'pscore'  
         scriptLocation: 'inlineScript'  
         inlineScript: |
-          $Biceps = Get-ChildItem $(Path) -Recurse -Include *.bicep
+          $Biceps = Get-ChildItem "$(bicepPath)" -Recurse -Include *.bicep
           $Biceps
           $Biceps | Foreach-Object {
               az bicep build --file $_.FullName --outfile "$(Build.ArtifactStagingDirectory)/$($_.BaseName).json" 
